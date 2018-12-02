@@ -11,9 +11,11 @@ Fonctions pour la création du jeu de données.
 """
 
 from selenium import webdriver
-from time import sleep
+from selenium.common.exceptions import NoSuchElementException
+from time import sleep, time
 from pathlib import Path
 import re
+import json
 
 
 class Session:
@@ -22,16 +24,22 @@ class Session:
     de Tours
     """
     DEPART = "https://www.seloger.com/immobilier/achat/immo-tours-37/"
-    REP_INI = Path(".").resolve()
 
     def __init__(self):
         self.navigateur = webdriver.Firefox()
         self.navigateur.get(Session.DEPART)
         sleep(5)
 
-    def get_annonces(self):
-        """Retourne la liste des annonces dans une page"""
-        return self.navigateur.find_elements_by_class_name("c-pa-list")
+    def traitement_page_courante(self, path):
+        """sauvegarde les annonces dans le fichier fournit par path au format json, renvoit la
+        durée d'exécution""" 
+        debut = time()
+        with open(path, 'a') as f:
+            for a in self.navigateur.find_elements_by_class_name("c-pa-list"):
+                ann = Annonce(a)
+                f.write(ann.to_json())
+
+        return time() - debut
 
 
     def page_suivante(self):
@@ -45,13 +53,24 @@ class Annonce:
     celle de la page dans le nagivateur n'est pas stocké dans l'élément.
     """
 
-    motif = re.compile("(\d+)\sp\s(\d+)\sch\s(\d+).*")
-
     def __init__(self, annonce):
         self.set_id(annonce)
         self.set_genre(annonce)
         self.set_prix(annonce)
         self.set_pcs(annonce)
+        self.set_desc(annonce)
+        self.set_lien(annonce)
+
+
+    def __str__(self):
+        return f"""
+id          : {self.id}
+genre       : {self.genre}
+pcs         : {self.pcs}
+lien        : {self.lien}
+prix        : {self.prix}
+description : {self.desc}
+"""
 
 
     def set_genre(self, annonce):
@@ -74,17 +93,56 @@ class Annonce:
     def set_pcs(self, annonce):
         """Affecte pieces chambres surface"""
         c = annonce.find_element_by_class_name("c-pa-criterion")
-        se = Annonce.motif.search(c.text)
-        self.pieces, self.chambres, self.surface = se.groups()
+        self.pcs = c.text
 
 
-    def voir_detail(self, annonce):
-        """Clique le lien vers la page détaillée"""
+    def set_desc(self, annonce):
+        """Récupère la description"""
+        d = annonce.find_element_by_class_name("description")
+        self.desc = d.text
+
+
+    def set_lien(self, annonce):
+        """Affecte le lien vers la page détaillée"""
         b = annonce.find_element_by_class_name("button")
         l = b.find_element_by_tag_name("a")
-        l.click()
+        self.lien = l.get_attribute("href")
+        # l.click si jamais on veut le détail
+
+    
+    def to_json(self):
+        """Renvoit une chaine pour stocker le résultat en json."""
+        return json.dumps(self.__dict__)
+
+
+motif = re.compile("(\d+)\sp\s(\d+)\sch\s(\d+).*")
+def pcs_conv(pcs):
+    """De la chaine pcs renvoit le triplet pièces, chambres, surface."""
+    s = motif.search(pcs)
+    return s.groups()
+
+
+def main():
+    REP_INI = Path(".").resolve()
+    suffixe = "sauvegarde/donnees_brutes{}.json"
+    c = 0
+    fichier = REP_INI / suffixe.format(c)
+    while fichier.exists():
+        c += 1
+        fichier = REP_INI / suffixe.format(c)
+    
+    nav = Session()
+    while True:
+        duree = nav.traitement_page_courante(fichier)
+        if duree < 5:
+            sleep(6 - int(duree))
+        try:
+            nav.page_suivante()
+        except NoSuchElementException:
+            break
+        sleep(5)
+    nav.navigateur.quit()
 
 
 if __name__ == "__main__":
-    nav = Session()
-
+    main()
