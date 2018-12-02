@@ -37,6 +37,23 @@ class Session:
         self.navigateur.find_element_by_link_text("Suivant").click()
 
 
+def get_genre(annonce):
+    """Fournit le style de l'annonce"""
+    l = annonce.find_element_by_class_name("c-pa-link")
+    return l.text
+
+
+def get_id(annonce):
+    """Renvoit l'identifiant unique de l'annonce"""
+    return annonce.get_attribute("id")
+
+
+def get_bouton(annonce):
+    """Renvoit le lien vers la page détaillée"""
+    b = annonce.find_element_by_class_name("button")
+    return b.find_element_by_tag_name("a")
+
+
 if __name__ == "__main__":
     nav = Session()
 
