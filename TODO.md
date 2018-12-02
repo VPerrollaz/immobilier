@@ -1,7 +1,6 @@
 # A FAIRE
 
-- créer une classe résumant les informations d'une annonce pour vivre en mémoire
-- reformuler le crawler pour avoir une classe session et des méthodes plutôt que des appels de
-fonctions croisés
+- Créer une classe résumant les informations d'une annonce pour vivre en mémoire
+- Gérer le stockage en mémoire des annonces.
 - Ajouter un notebook pour la partie nettoyage des données
 - Ajouter un notebook pour la partie Machine Learning
