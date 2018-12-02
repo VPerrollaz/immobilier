@@ -14,27 +14,29 @@ from selenium import webdriver
 from time import sleep
 from pathlib import Path
 
-DEPART = "https://www.seloger.com/immobilier/achat/immo-tours-37/"
-REP_INI = Path(".").resolve()
+class Session:
+    """
+    Classe permettant de parcourir le site seloger pour récupérer les annonces de la ville
+    de Tours
+    """
+    DEPART = "https://www.seloger.com/immobilier/achat/immo-tours-37/"
+    REP_INI = Path(".").resolve()
 
-def get_annonces(navigateur):
-    """Retourne la liste des annonces dans une page"""
-    liste = navigateur.find_elements_by_class_name("c-pa-list")
-    return liste
+    def __init__(self):
+        self.navigateur = webdriver.Firefox()
+        self.navigateur.get(Session.DEPART)
+        sleep(5)
+
+    def get_annonces(self):
+        """Retourne la liste des annonces dans une page"""
+        return self.navigateur.find_elements_by_class_name("c-pa-list")
 
 
-def get_page_suivante(navigateur):
-    """Retourne le tag pour passer à la page suivante."""
-    return navigateur.find_element_by_link_text("Suivant")
-
-
-def lancement():
-    navigateur = webdriver.Firefox()
-    navigateur.get(DEPART)
-    sleep(5)
-    return navigateur
+    def page_suivante(self):
+        """Passe à la page suivante"""
+        self.navigateur.find_element_by_link_text("Suivant").click()
 
 
 if __name__ == "__main__":
-    nav = lancement()
+    nav = Session()
 
