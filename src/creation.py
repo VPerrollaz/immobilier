@@ -12,19 +12,20 @@ Fonctions pour la création du jeu de données.
 
 from selenium import webdriver
 from time import sleep
+from pathlib import Path
 
 DEPART = "https://www.seloger.com/immobilier/achat/immo-tours-37/"
-
+ROOT = Path(".").resolve()
 
 def main():
     navigateur = webdriver.Firefox()
     navigateur.get(DEPART)
-    sleep(3)
-    with open("sauvegarde/root.html", "w") as f:
-        f.write(navigateur.page_source)
+    sleep(5)
+    fichier_courant = ROOT / "sauvegarde" / "test.html"
+    fichier_courant.write_text(navigateur.page_source)
+
 
 
 if __name__ == "__main__":
     main()
-
 
