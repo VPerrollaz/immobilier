@@ -15,17 +15,26 @@ from time import sleep
 from pathlib import Path
 
 DEPART = "https://www.seloger.com/immobilier/achat/immo-tours-37/"
-ROOT = Path(".").resolve()
+REP_INI = Path(".").resolve()
 
-def main():
+def get_annonces(navigateur):
+    """Retourne la liste des annonces dans une page"""
+    liste = navigateur.find_elements_by_class_name("c-pa-list")
+    return liste
+
+
+def get_page_suivante(navigateur):
+    """Retourne le tag pour passer à la page suivante."""
+    return navigateur.find_element_by_link_text("Suivant")
+
+
+def lancement():
     navigateur = webdriver.Firefox()
     navigateur.get(DEPART)
     sleep(5)
-    fichier_courant = ROOT / "sauvegarde" / "test.html"
-    fichier_courant.write_text(navigateur.page_source)
-
+    return navigateur
 
 
 if __name__ == "__main__":
-    main()
+    nav = lancement()
 
