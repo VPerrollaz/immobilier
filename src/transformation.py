@@ -66,12 +66,19 @@ def transformation_pcs(annonce):
     return annonce
 
 
+def transformation_desc(annonce):
+    """Garde la première ligne de la description seulement"""
+    annonce["desc"] = annonce["desc"].splitlines[0]
+    return annonce
+
+
 def main():
     totalites = chargement("./donnees/brute.json")
     logements = (transformation_logement(annonce) for annonce in totalites 
                  if filtre_logement(annonce))
     avec_pc = (transformation_pcs(annonce) for annonce in logements)
-    return avec_pc
+    desc_strip = (transformation_desc(annonce) for annonce in avec_pc)
+    return desc_strip
 
 
 if __name__ == "__main__":

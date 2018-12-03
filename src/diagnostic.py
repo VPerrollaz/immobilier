@@ -10,6 +10,7 @@
 Fonctions pour diagnostiquer les données brutes.
 """
 import json
+import regex as re
 
 def pprint(dico):
     """Affichage espacé d'un dictionnaire"""
@@ -54,6 +55,15 @@ def echantillon_pcs(annonces):
 
     return resultat
 
+def nb_ligne_desc(annonce):
+    return len(annonce["desc"].splitlines())
+
+
+motif = re.compile("(\p{Lu}+(\s\p{Lu}+)?)", re.UNICODE)
+def quartier(annonce):
+    annonce["desc"], *_ = annonce["desc"].splitlines()
+    return motif.findall(annonce["desc"])[0][0]
+
 
 def main():
     annonces = chargement("./donnees/brute.json")
@@ -65,6 +75,7 @@ def main():
 
     print("\nechantillon de la chaine pcs :")
     pprint(echantillon_pcs(annonces))
+
 
 if __name__ == "__main__":
     main()
