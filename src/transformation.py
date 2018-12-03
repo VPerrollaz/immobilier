@@ -20,16 +20,25 @@ def pcs_conv(pcs):
     return s.groups()
 
 
-def get_genres(nom_fichier):
-    """Renvoit l'ensemble de tous les genres contenu dans le fichier codé en json"""
+def get_genres(ds):
+    """Renvoit l'ensemble des genres à partir de la liste des dictionnaires codant les
+    annonces"""
     genres = set()
-    with open(nom_fichier, "r") as fichier:
-        for ligne in fichier:
-            d = json.loads(ligne)
-            genres.add(d["genre"])
+    for d in ds:
+        genres.add(d["genre"])
 
     return genres
 
 
+def chargement(nom_fichier):
+    """Retourne la liste des dictionnaires correspondant aux annonces"""
+    resultat = list()
+    with open(nom_fichier, "r") as fichier:
+        for ligne in fichier:
+            resultat.append(json.loads(ligne))
 
+    return resultat
+
+if __name__ == "__main__":
+    annonces = chargement("./donnees/brute.json")
 
