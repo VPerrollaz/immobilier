@@ -20,14 +20,13 @@ def pcs_conv(pcs):
     return s.groups()
 
 
-def get_genres(ds):
-    """Renvoit l'ensemble des genres à partir de la liste des dictionnaires codant les
-    annonces"""
-    genres = set()
+def compte_genres(ds):
+    """Renvoit le nombre d'annonces par genre."""
+    compteur = dict()
     for d in ds:
-        genres.add(d["genre"])
+        compteur[d["genre"]] = compteur.get(d["genre"], 0) + 1
 
-    return genres
+    return compteur
 
 
 def chargement(nom_fichier):
