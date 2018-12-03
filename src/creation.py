@@ -36,6 +36,7 @@ class Session:
             for a in self.navigateur.find_elements_by_class_name("c-pa-list"):
                 ann = Annonce(a)
                 f.write(ann.to_json())
+                f.write("\n")
 
         return time() - debut
 
