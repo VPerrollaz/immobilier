@@ -22,12 +22,17 @@ def chargement(nom_fichier):
     return resultat
 
 
-def filtre(annonces):
-    """Ne garde que les maisons et appartements"""
+def filtre_logement(annonces):
+    """Ne garde que les maisons et appartements et assénit l'entrée genre en ajoutant une
+    entrée neuf"""
     resultat = list()
-    valide = {"Appartement", "Maison / Villa", "Appartement neuf", "Maison / Villa neuve"}
+    valide = {"Appartement" : ("Appartement", False),
+              "Maison / Villa" : ("Maison", False),
+              "Appartement neuf" : ("Appartement", True),
+              "Maison / Villa neuve" : ("Maison", True)}
     for annonce in annonces:
         if annonce["genre"] in valide: 
+            annonce["genre"], annonce["Neuf"] = valide[annonce["genre"]]
             resultat.append(annonce)
 
     return resultat
@@ -41,8 +46,9 @@ def pcs_conv(pcs):
 
 
 def main():
-    annonces = filtre(chargement("./donnees/brute.json"))
-    return annonces
+    totalites = chargement("./donnees/brute.json")
+    pertinentes = filtre_logement(totalites)
+    return pertinentes
 
 if __name__ == "__main__":
     annonces = main()
