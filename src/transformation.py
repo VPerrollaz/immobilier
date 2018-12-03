@@ -29,39 +29,47 @@ def chargement(nom_fichier):
     return resultat
 
 
-def filtre_logement(annonce):
-    """Ne garde que les maisons et appartements et assénit l'entrée genre en ajoutant une
-    entrée neuf"""
-    valide = {"Appartement" : ("Appartement", False),
-              "Maison / Villa" : ("Maison", False),
-              "Appartement neuf" : ("Appartement", True),
-              "Maison / Villa neuve" : ("Maison", True)}
-    if annonce["genre"] in valide: 
-        annonce["genre"], annonce["Neuf"] = valide[annonce["genre"]]
+valides = {"Appartement" : ("Appartement", False),
+          "Maison / Villa" : ("Maison", False),
+          "Appartement neuf" : ("Appartement", True),
+          "Maison / Villa neuve" : ("Maison", True)}
 
+
+def filtre_logement(annonce):
+    """Ne garde que les logements"""
+    return annonce["genre"] in valides
+
+
+def transformation_logement(annonce):
+    """Assainit l'entrée genre en ajoutant une entrée Neuf"""
+    annonce["genre"], annonce["Neuf"] = valides[annonce["genre"]]
     return annonce
 
 
-motif_ancien = re.compile("(\d+)\sp\s(\d+)\sch\s(\d+).*")
-motif_neuf = re.compile("(\d+)\sp\s(\d+)\sm.*")
-def filtre_pcs(annonce):
+surface = re.compile("(\d+(,\d+)?)\s?m")
+pieces = re.compile("(\d+)\sp")
+def transformation_pcs(annonce):
     """De la chaine pcs renvoit le triplet pièces, chambres, surface."""
-    if annonce["Neuf"]:
-        s = motif_neuf.search(annonce["pcs"])
-        nb_pieces, surface = s.groups()
-    else:
-        s = motif_ancien.search(annonce["pcs"])
-        nb_pieces, _, surface = s.groups()
+    pcs = annonce["pcs"]
+    res = surface.search(pcs)
+    try:
+        annonce["Surface"] = res.group()
+    except:
+        annonce["Surface"] = "NaN"
 
-    annonce["Surface"] = int(surface)
-    annonce["Nombre_pieces"] = int(nb_pieces)
+    res = pieces.search(pcs)
+    try:
+        annonce["Nombre_pieces"] = res.group()
+    except:
+        annonce["Nombre_pieces"] = "NaN"
     return annonce
 
 
 def main():
     totalites = chargement("./donnees/brute.json")
-    logements = (filtre_logement(annonce) for annonce in totalites)
-    avec_pc = (filtre_pcs(annonce) for annonce in logements)
+    logements = (transformation_logement(annonce) for annonce in totalites 
+                 if filtre_logement(annonce))
+    avec_pc = (transformation_pcs(annonce) for annonce in logements)
     return avec_pc
 
 
