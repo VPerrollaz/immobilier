@@ -116,7 +116,7 @@ description : {self.desc}
 
 def main():
     depart = "https://www.seloger.com/immobilier/achat/immo-tours-37/"
-    fichier = Path(".").resolve() / "sauvegarde/res.json"
+    fichier = Path(".").resolve() / "donnees/brute.json"
     nav = Session(depart)
     while True:
         duree = nav.traitement_page_courante(fichier)
