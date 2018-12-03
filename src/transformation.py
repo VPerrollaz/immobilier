@@ -53,13 +53,13 @@ def transformation_pcs(annonce):
     pcs = annonce["pcs"]
     res = surface.search(pcs)
     try:
-        annonce["Surface"] = res.group()
+        annonce["Surface"] = float(res.group().replace(",",".")[:-2])
     except:
         annonce["Surface"] = "NaN"
 
     res = pieces.search(pcs)
     try:
-        annonce["Nombre_pieces"] = res.group()
+        annonce["Nombre_pieces"] = int(res.group()[:-2])
     except:
         annonce["Nombre_pieces"] = "NaN"
     annonce.pop("pcs", None)
