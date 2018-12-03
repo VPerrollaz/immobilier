@@ -11,6 +11,11 @@ Fonctions pour diagnostiquer les données brutes.
 """
 import json
 
+def pprint(dico):
+    """Affichage espacé d'un dictionnaire"""
+    for clef in dico:
+        print("{} : {}".format(clef, dico[clef]))
+
 
 def chargement(nom_fichier):
     """Retourne la liste des dictionnaires correspondant aux annonces"""
@@ -22,14 +27,44 @@ def chargement(nom_fichier):
     return resultat
 
 
-def compte_genres(ds):
+def get_genres(annonces):
+    """Retourne l'ensemble des genres."""
+    resultat = set()
+    for annonce in annonces:
+        resultat.add(annonce["genre"])
+
+    return resultat
+
+
+def compte_genres(annonces):
     """Renvoit le nombre d'annonces par genre."""
     compteur = dict()
-    for d in ds:
-        compteur[d["genre"]] = compteur.get(d["genre"], 0) + 1
+    for annonce in annonces:
+        compteur[annonce["genre"]] = compteur.get(annonce["genre"], 0) + 1
 
     return compteur
 
 
-if __name__ == "__main__":
+def echantillon_pcs(annonces):
+    """Fournit un échantillon des chaines pcs par genre"""
+    resultat = dict()
+    for annonce in annonces:
+        if annonce["genre"] not in resultat:
+            resultat[annonce["genre"]] = annonce["pcs"]
+
+    return resultat
+
+
+def main():
     annonces = chargement("./donnees/brute.json")
+    print("Genres présents : ")
+    print(get_genres(annonces))
+
+    print("\nNombres d'annonces par genres : ")
+    pprint(compte_genres(annonces))
+
+    print("\nechantillon de la chaine pcs :")
+    pprint(echantillon_pcs(annonces))
+
+if __name__ == "__main__":
+    main()
