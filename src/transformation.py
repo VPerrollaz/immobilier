@@ -12,6 +12,13 @@ Transformation des données brutes.
 import re
 import json
 
+
+def pprint(dico):
+    """Affichage espacé d'un dictionnaire"""
+    for clef in dico:
+        print("{} : {}".format(clef, dico[clef]))
+
+
 def chargement(nom_fichier):
     """Retourne la liste des dictionnaires correspondant aux annonces"""
     resultat = list()
@@ -22,36 +29,42 @@ def chargement(nom_fichier):
     return resultat
 
 
-def filtre_logement(annonces):
+def filtre_logement(annonce):
     """Ne garde que les maisons et appartements et assénit l'entrée genre en ajoutant une
     entrée neuf"""
-    resultat = list()
     valide = {"Appartement" : ("Appartement", False),
               "Maison / Villa" : ("Maison", False),
               "Appartement neuf" : ("Appartement", True),
               "Maison / Villa neuve" : ("Maison", True)}
-    for annonce in annonces:
-        if annonce["genre"] in valide: 
-            annonce["genre"], annonce["Neuf"] = valide[annonce["genre"]]
-            resultat.append(annonce)
+    if annonce["genre"] in valide: 
+        annonce["genre"], annonce["Neuf"] = valide[annonce["genre"]]
 
-    return resultat
+    return annonce
 
 
-motif = re.compile("(\d+)\sp\s(\d+)\sch\s(\d+).*")
-def pcs_conv(pcs):
+motif_ancien = re.compile("(\d+)\sp\s(\d+)\sch\s(\d+).*")
+motif_neuf = re.compile("(\d+)\sp\s(\d+)\sm.*")
+def filtre_pcs(annonce):
     """De la chaine pcs renvoit le triplet pièces, chambres, surface."""
-    s = motif.search(pcs)
-    return s.groups()
+    if annonce["Neuf"]:
+        s = motif_neuf.search(annonce["pcs"])
+        nb_pieces, surface = s.groups()
+    else:
+        s = motif_ancien.search(annonce["pcs"])
+        nb_pieces, _, surface = s.groups()
+
+    annonce["Surface"] = int(surface)
+    annonce["Nombre_pieces"] = int(nb_pieces)
+    return annonce
 
 
 def main():
     totalites = chargement("./donnees/brute.json")
-    pertinentes = filtre_logement(totalites)
-    return pertinentes
+    logements = (filtre_logement(annonce) for annonce in totalites)
+    avec_pc = (filtre_pcs(annonce) for annonce in logements)
+    return avec_pc
+
 
 if __name__ == "__main__":
-    annonces = main()
-    print(len(annonces))
-
+    annonces = list(main())
 
