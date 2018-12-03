@@ -29,10 +29,10 @@ def chargement(nom_fichier):
     return resultat
 
 
-valides = {"Appartement" : ("Appartement", False),
-          "Maison / Villa" : ("Maison", False),
-          "Appartement neuf" : ("Appartement", True),
-          "Maison / Villa neuve" : ("Maison", True)}
+valides = {"Appartement" : ("Appartement", 0),
+          "Maison / Villa" : ("Maison", 0),
+          "Appartement neuf" : ("Appartement", 1),
+          "Maison / Villa neuve" : ("Maison", 1)}
 
 
 def filtre_logement(annonce):
@@ -62,6 +62,7 @@ def transformation_pcs(annonce):
         annonce["Nombre_pieces"] = res.group()
     except:
         annonce["Nombre_pieces"] = "NaN"
+    annonce.pop("pcs", None)
     return annonce
 
 
