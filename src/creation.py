@@ -14,7 +14,6 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from time import sleep, time
 from pathlib import Path
-import re
 import json
 
 
@@ -23,11 +22,10 @@ class Session:
     Classe permettant de parcourir le site seloger pour récupérer les annonces de la ville
     de Tours
     """
-    DEPART = "https://www.seloger.com/immobilier/achat/immo-tours-37/"
 
-    def __init__(self):
+    def __init__(self, depart):
         self.navigateur = webdriver.Firefox()
-        self.navigateur.get(Session.DEPART)
+        self.navigateur.get(depart)
         sleep(5)
 
     def traitement_page_courante(self, path):
@@ -115,25 +113,13 @@ description : {self.desc}
         return json.dumps(self.__dict__)
 
 
-motif = re.compile("(\d+)\sp\s(\d+)\sch\s(\d+).*")
-def pcs_conv(pcs):
-    """De la chaine pcs renvoit le triplet pièces, chambres, surface."""
-    s = motif.search(pcs)
-    return s.groups()
-
-
 def main():
-    REP_INI = Path(".").resolve()
-    suffixe = "sauvegarde/donnees_brutes{}.json"
-    c = 0
-    fichier = REP_INI / suffixe.format(c)
-    while fichier.exists():
-        c += 1
-        fichier = REP_INI / suffixe.format(c)
-    
-    nav = Session()
+    depart = "https://www.seloger.com/immobilier/achat/immo-tours-37/"
+    fichier = Path(".").resolve() / "sauvegarde/res.json"
+    nav = Session(depart)
     while True:
         duree = nav.traitement_page_courante(fichier)
+        print("page {} traitée".format(nav.navigateur.current_url))
         if duree < 5:
             sleep(6 - int(duree))
         try:
