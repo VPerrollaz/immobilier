@@ -129,6 +129,6 @@ def main():
 if __name__ == "__main__":
     annonces = list(main())
     with open("./donnees/data.csv", "w") as fichier:
-        fichier.write("Id ; Genre ; Neuf ; Surface ; Pieces ; Quartier ; Prix\n")
+        fichier.write("Id;Genre;Neuf;Surface;Pieces;Quartier;Prix\n")
         for ann in annonces:
-            fichier.write("{id} ; {genre} ; {Neuf}; {Surface}; {Nombre_pieces} ; {Quartier} ; {prix}\n".format(**ann))
+            fichier.write("{id};{genre};{Neuf};{Surface};{Nombre_pieces};{Quartier};{prix}\n".format(**ann))
