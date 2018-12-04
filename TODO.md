@@ -2,6 +2,8 @@
 
 - Gérer le problème de la fuite de mémoire de geckodriver (relancer périodiquement?)
 - Améliorer la détection du quartier
+- Réécrire transformation en POO?
 - Ajouter un notebook pour la partie Nettoyage/Prévisualisation des données
 - Ajouter un notebook pour la partie Machine Learning
-- Mettre en production les deux derniers notebooks.
+- Distinguer les justifications (story-telling) via les notebooks, de la production via les
+  scripts py
