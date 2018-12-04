@@ -9,7 +9,7 @@
 """
 Transformation des données brutes.
 """
-import re
+import regex as re
 import json
 
 
@@ -66,21 +66,69 @@ def transformation_pcs(annonce):
     return annonce
 
 
+liste_quartiers = ["prébendes", "beaujardin", "conservatoire", "cathédrale", 
+        "fontaines", "2 lions", "halles", "heurteloup", "rotonde", "cher", "velpeau",
+        "strasbourg", "paul bert", "febvotte", "eloi", "tranchée", "montjoyeux", "gare",
+        "michelet"  "rabelais", "mairie", "portes", "cluzel", "béranger", "radegonde", "sud",
+        "nord", "centre"]
 def transformation_desc(annonce):
-    """Garde la première ligne de la description seulement"""
-    annonce["desc"] = annonce["desc"].splitlines[0]
+    """On garde la première de la description et on cherche des mots clefs pour les quartiers"""
+    annonce["desc"] = annonce["desc"].splitlines()[0]
+    if len(annonce["Quartier"]) > 0:
+        return annonce
+    en_minuscule = annonce["desc"].lower() 
+    for quartier in liste_quartiers:
+        if quartier in en_minuscule:
+            annonce["Quartier"].append(quartier)
+
+    if annonce["Quartier"] == []:
+        annonce["Quartier"] = "NaN"
+    else:
+        annonce["Quartier"] = annonce["Quartier"][0]
     return annonce
 
 
+motif = re.compile("tours-?37/([a-z])/.*")
+def transformation_lien(annonce):
+    """Utilisation du lien pour identifier certains quartiers"""
+    res = motif.search(annonce["lien"])
+    annonce["Quartier"] = []
+    try:
+        qu, *_ = res.groups()
+    except AttributeError:
+        pass
+    else:
+        annonce["Quartier"].append(qu)
+    return annonce
+
+def transformation_prix(annonce):
+    """Conversion du prix en entier"""
+    try:
+        annonce["prix"] = int(re.sub("\D","",annonce["prix"]))
+    except ValueError:
+        annonce["prix"] = "NaN"
+    return annonce
+
+def suppression_lien_desc(annonce):
+    """Enlevement des clefs inutiles"""
+    annonce.pop("desc", None)
+    annonce.pop("lien", None)
+    return annonce
+
 def main():
     totalites = chargement("./donnees/brute.json")
-    logements = (transformation_logement(annonce) for annonce in totalites 
+    mod_prix = (transformation_prix(annonce) for annonce in totalites)
+    logements = (transformation_logement(annonce) for annonce in mod_prix 
                  if filtre_logement(annonce))
     avec_pc = (transformation_pcs(annonce) for annonce in logements)
-    desc_strip = (transformation_desc(annonce) for annonce in avec_pc)
-    return desc_strip
+    avec_quartiers = (transformation_lien(annonce) for annonce in avec_pc)
+    avec_quartiers_bis = (transformation_desc(annonce) for annonce in avec_quartiers)
+    return (suppression_lien_desc(annonce) for annonce in avec_quartiers_bis)
 
 
 if __name__ == "__main__":
     annonces = list(main())
-
+    with open("./donnees/data.csv", "w") as fichier:
+        fichier.write("Id ; Genre ; Neuf ; Surface ; Pieces ; Quartier ; Prix\n")
+        for ann in annonces:
+            fichier.write("{id} ; {genre} ; {Neuf}; {Surface}; {Nombre_pieces} ; {Quartier} ; {prix}\n".format(**ann))

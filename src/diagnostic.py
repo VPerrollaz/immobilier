@@ -59,10 +59,9 @@ def nb_ligne_desc(annonce):
     return len(annonce["desc"].splitlines())
 
 
-motif = re.compile("(\p{Lu}+(\s\p{Lu}+)?)", re.UNICODE)
+liste_quartiers = ["centre", "beaujardin", "conservatoire", "cathédrale", "nord", "fontaines", "2 lions", "halles", "heurteloup", "rotonde", "cher", "velpeau"]
 def quartier(annonce):
     annonce["desc"], *_ = annonce["desc"].splitlines()
-    return motif.findall(annonce["desc"])[0][0]
 
 
 def main():
