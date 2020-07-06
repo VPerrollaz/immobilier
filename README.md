@@ -1,6 +1,6 @@
 Développement d'un modèle de prédiction de prix pour les biens dans l'agglomération de Tours.
 
-1. Aspiration des données, génération .json
+1. Aspiration des données via selenium, génération .json
 2. Transformation des données, génération csv
 3. Nettoyage données, génération numpy
 4. Entrainements modèles
