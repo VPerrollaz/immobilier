@@ -1,5 +1,7 @@
 # A FAIRE
 
+- Distinguer nettoyage et exploration même si on utilise pandas dans les deux cas.
+- Utiliser pyjanitor.
 - Regarder pandas.pop pour enlever des colonnes.
 - Reprendre le notebook de nettoyage via scikit learn, utilisation de ColumnTransformer.
 - Ajouter un notebook pour la partie Machine Learning.
